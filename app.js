@@ -11,7 +11,9 @@ app.get('/auth', middleWarez.auth)
 // Callback service parsing the authorization token
 // and asking for the access token
 app.get('/callback', middleWarez.callback)
-
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
 app.get('/success', middleWarez.success)
 app.get('/', middleWarez.index)
 

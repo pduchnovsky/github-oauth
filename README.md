@@ -8,7 +8,33 @@ Github, Github Enterprise and Gitlab are currently supported, but as this is a g
 
 Other implementations in: [Go lang](https://github.com/igk1972/netlify-cms-oauth-provider-go).
 
-## 1) Install Locally
+## 1) Deploy via docker-compose
+```docker-compose
+  github-oauth:
+    image: ghcr.io/pduchnovsky/github-oauth
+    container_name: github-oauth
+    environment:
+      - NODE_ENV=production
+      - ORIGINS=${DOMAIN}
+      - OAUTH_CLIENT_ID=${OAUTH_CLIENT_ID}
+      - OAUTH_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
+      - REDIRECT_URL=https://github-oauth.${DOMAIN}
+      - OAUTH_PROVIDER=github
+    #labels: # Optional if you use traefik
+    #  - traefik.enable=true
+    #  - traefik.http.routers.github-oauth.rule=Host(`github-oauth.${DOMAIN}`)
+    #  - traefik.http.routers.github-oauth.entrypoints=websecure
+    #  - traefik.http.routers.github-oauth.middlewares=external@file,auth@file
+    #  - traefik.http.services.github-oauth.loadbalancer.server.port=3000
+    healthcheck:
+      test: wget --spider -q http://localhost:3000/health > /dev/null 2>&1 || exit 1
+      start_period: 5s
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+```
+
+## 2) Install Locally
 
 **Install Repo Locally**
 
@@ -21,7 +47,7 @@ npm install
 **Create Oauth App**
 Information is available on the [Github Developer Documentation](https://developer.github.com/apps/building-integrations/setting-up-and-registering-oauth-apps/registering-oauth-apps/) or [Gitlab Docs](https://docs.gitlab.com/ee/integration/oauth_provider.html). Fill out the fields however you like, except for **authorization callback URL**. This is where Github or Gitlab will send your callback after a user has authenticated, and should be `https://your.server.com/callback` for use with this repo.
 
-## 2) Config
+## 3) Config
 
 ### Auth Provider Config
 
@@ -77,7 +103,7 @@ backend:
   base_url: https://your.server.com # Path to ext auth provider
 ```
 
-## 3) Deploy
+## 4) Deploy
 
 ### Heroku
 
